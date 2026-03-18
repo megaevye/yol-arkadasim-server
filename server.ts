@@ -30,16 +30,21 @@ interface User {
 const STATS_FILE = path.join(process.cwd(), "stats.json");
 
 async function startServer() {
-  const app = express();
+const app = express();
   const httpServer = createServer(app);
   const io = new Server(httpServer, {
-    cors: { origin: "*" },
+    cors: { 
+      origin: "*",
+      methods: ["GET", "POST"],
+      credentials: true
+    },
     transports: ['websocket', 'polling'],
+    allowEIO3: true,
     pingTimeout: 60000,
     pingInterval: 25000
   });
 
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3000;
   let users: Map<string, User> = new Map();
   let messages: any[] = [];
   
@@ -284,8 +289,8 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.join(process.cwd(), "dist")));
-    app.get("*", (req, res) => res.sendFile(path.join(process.cwd(), "dist", "index.html")));
+    //app.use(express.static(path.join(process.cwd(), "dist")));
+    //app.get("*", (req, res) => res.sendFile(path.join(process.cwd(), "dist", "index.html")));
   }
 
   httpServer.listen(PORT, "0.0.0.0", () => {
